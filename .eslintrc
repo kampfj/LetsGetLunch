@@ -1,0 +1,39 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "extends": "airbnb",
+  "parser": "babel-eslint",
+  "rules": {
+    "brace-style": [2, "1tbs"],
+    "camelcase": 0,
+    "no-bitwise": 2,
+    "no-alert": "off",
+    "no-empty": 2,
+    "no-ex-assign": 2,
+    "no-lonely-if": 2,
+    "object-curly-newline": "off",
+    "no-mixed-spaces-and-tabs": 2,
+    "no-tabs": 2,
+    "react/no-array-index-key": "off",
+    "no-underscore-dangle": 0,
+    "no-unused-vars": 0,
+    "max-len": "off",
+    "quote-props": [2, "as-needed"],
+    "react/prop-types": 0,
+    "quotes": [2, "single", "avoid-escape"],
+    "react/jsx-filename-extension": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "import/prefer-default-export": "off",
+    "strict": 0,
+    "semi": ["error", "never"], // require or disallow use of semicolons instead of ASI,
+    "arrow-parens": ["error", "as-needed"], // require the use of parenthesis when needed
+    "no-param-reassign": "off",
+    "array-callback-return": "off"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2017
+  }
+}
