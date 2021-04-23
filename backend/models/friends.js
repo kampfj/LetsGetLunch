@@ -1,8 +1,8 @@
 const { Schema, model } = require('mongoose')
 
 const friendsSchema = new Schema({
-  sender: { type: Schema.Types.ObjectId, ref: 'User' },
-  getter: { type: Schema.Types.ObjectId, ref: 'User' },
+  sender: String,
+  getter: String,
   status: {
     type: Number, 
     enums: [

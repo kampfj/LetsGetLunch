@@ -4,8 +4,8 @@ const cookieSession = require('cookie-session')
 const path = require('path')
 
 const AccountRouter = require('./routes/account')
-// const ApiRouter = require('./routes/api')
-// const isAuthenticated = require('./middlewares/isAuthenticated')
+const ApiRouter = require('./routes/api')
+const isAuthenticated = require('./middlewares/isAuthenticated')
 
 const app = express()
 const MONGO_URI = 'mongodb://localhost:27017/testdb'
@@ -45,7 +45,7 @@ app.get('/logged_in', (req, res) => {
 })
 
 app.use('/account', AccountRouter)
-// app.use('/api', ApiRouter)
+app.use('/api', ApiRouter)
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'))
