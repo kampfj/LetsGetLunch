@@ -1,5 +1,6 @@
 const express = require('express')
 const Friends = require('../models/friends')
+const User = require('../models/user')
 const router = express.Router()
 const isAuthenticated = require('../middlewares/isAuthenticated')
 
@@ -17,6 +18,20 @@ const isAuthenticated = require('../middlewares/isAuthenticated')
 
 router.get('/', (req, res) => {
   res.send('On account API')
+})
+
+router.get('/users', async (req, res, next) => {
+  try {
+    await User.find((err, questions) => {
+      if (questions) {
+        res.send(questions)
+      } else {
+        next('ERROR: there was a problem loading the questions')
+      }
+    })
+  } catch (err) {
+    res.send(`ERROR: ${err}`)
+  }
 })
 
 router.post('/friend', async (req, res) => {

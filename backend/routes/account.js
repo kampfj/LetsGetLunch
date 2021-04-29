@@ -8,9 +8,9 @@ router.get('/', (req, res) => {
 })
 
 router.post('/signup', async (req, res) => {
-  const { username, password } = req.body
+  const { username, password, image, hometown, major, school } = req.body
   try {
-    await User.create({ username, password }, (err, user) => {
+    await User.create({ username, password, image, hometown, major, school }, (err, user) => {
       if (user) {
         req.session.username = username
         req.session.password = password

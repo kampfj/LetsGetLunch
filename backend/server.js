@@ -8,7 +8,7 @@ const ApiRouter = require('./routes/api')
 const isAuthenticated = require('./middlewares/isAuthenticated')
 
 const app = express()
-const MONGO_URI = 'mongodb://localhost:27017/testdb'
+const MONGO_URI = 'mongodb://localhost:27017/LetsGetLunchDB'
 const ONE_DAY = 24 * 60 * 60 * 1000
 
 mongoose.connect(MONGO_URI, {

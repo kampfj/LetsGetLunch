@@ -4,11 +4,12 @@ const userSchema = new Schema({
   profile: {
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    image: { type: String, required: true },
     hometown: { type: String, required: true }, 
     major: { type: String }, 
     school: { type: String }
   },
-  friends: [{ type: Schema.Types.ObjectId, ref: 'Friends' }]
+  friends: [{ type: String }]
 })
 
 module.exports = model('User', userSchema)

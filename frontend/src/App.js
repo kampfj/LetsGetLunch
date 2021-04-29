@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import axios from 'axios'
+import NavBar from './NavBar'
+import Homepage from './Homepage'
+import Signup from './Signup'
+import Login from './Login'
 
 // there's nothing rendering on this page. We're just setting up the frontend routes and delegating rendering to the individual components. 
 const App = () => {
@@ -31,7 +35,7 @@ const App = () => {
         <br />
         <Switch>
           <Route path="/" exact>
-            <Homepage isLoggedIn={isLoggedIn} username={username} />
+            <Homepage />
           </Route>
           <Route path="/signup" exact>
             <Signup />
