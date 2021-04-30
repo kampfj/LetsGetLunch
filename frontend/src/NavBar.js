@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Link, Redirect } from 'react-router-dom'
 import { Button, Nav, Navbar } from 'react-bootstrap'
+import { ModelBuildContext } from 'twilio/lib/rest/autopilot/v1/assistant/modelBuild'
+import Friends from './Friends'
 
 const NavBar = props => {
   const { isLoggedIn, setIsLoggedIn, username, setUsername } = props
@@ -34,6 +36,10 @@ const NavBar = props => {
       &nbsp; &nbsp;
       <Link to="/">
         <Button size="sm" variant="outline-secondary" onClick={logoutHelper}> Logout </Button>
+      </Link>
+      &nbsp; &nbsp;
+      <Link to="/friends">
+        <Button size="sm" variant="outline-secondary"> Friends </Button>
       </Link>
     </>
   )

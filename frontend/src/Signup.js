@@ -3,21 +3,26 @@ import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { Container, Button, Form } from 'react-bootstrap'
 
-const Signup = () => {
+const Signup = ({ isLoggedIn, setIsLoggedIn, setCurrentUsername }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [image, setImage] = useState('')
+  const [hometown, setHometown] = useState('')
   const [major, setMajor] = useState('')
   const [school, setSchool] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
 
   const submitHelper = async () => {
-    const { data, status } = await axios.post('account/signup', { username, password, image, major, school })
+    const { data, status } = await axios.post('account/signup', { username, password, phoneNumber, image, hometown, major, school })
     if (status !== 200 || data.includes('Error')) {
       window.alert(data)
     }
+    setIsLoggedIn(true)
+    setCurrentUsername(username)
+    console.log(data)
+    console.log('posted to the db')
   }
 
-  // Changed my mind. I'm using React Bootstrap again lol. 
   return (
     <>
       <Container>
@@ -42,6 +47,11 @@ const Signup = () => {
           </Form.Group>
 
           <Form.Group>
+            <Form.Label> Hometown </Form.Label>
+            <Form.Control value={hometown} placeholder="Tell us where you're from..." onChange={e => setHometown(e.target.value)} />
+          </Form.Group>
+
+          <Form.Group>
             <Form.Label> School </Form.Label>
             <Form.Control value={school} placeholder="Enter university name" onChange={e => setSchool(e.target.value)} />
           </Form.Group>
@@ -51,6 +61,10 @@ const Signup = () => {
             <Form.Control value={major} placeholder="Enter major" onChange={e => setMajor(e.target.value)} />
           </Form.Group>
 
+          <Form.Group>
+            <Form.Label> Phone Number </Form.Label>
+            <Form.Control value={phoneNumber} placeholder="Enter number" onChange={e => setPhoneNumber(e.target.value)} />
+          </Form.Group>
 
           <Link to="/">
             <Button size="sm" variant="outline-primary" type="submit" onClick={submitHelper}>

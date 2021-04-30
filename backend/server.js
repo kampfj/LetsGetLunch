@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+require('dotenv').config()
 const express = require('express')
 const cookieSession = require('cookie-session')
 const path = require('path')

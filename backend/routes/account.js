@@ -1,5 +1,6 @@
 const express = require('express')
 const User = require('../models/user')
+
 const router = express.Router()
 const isAuthenticated = require('../middlewares/isAuthenticated')
 
@@ -8,19 +9,19 @@ router.get('/', (req, res) => {
 })
 
 router.post('/signup', async (req, res) => {
-  const { username, password, image, hometown, major, school } = req.body
+  const { username, password, image, phoneNumber, hometown, major, school } = req.body
   try {
-    await User.create({ username, password, image, hometown, major, school }, (err, user) => {
+    await User.create({ username, password, image, phoneNumber, hometown, major, school }, (err, user) => {
       if (user) {
         req.session.username = username
         req.session.password = password
         res.send('we logged you in')
       } else {
-        res.send('ERROR: we could not log you in')
+        res.send(`Error: we could not log you in due to ${err}`)
       }
     })
   } catch (err) {
-    res.send(`ERROR: ${err}`)
+    res.send(`Error: ${err}`)
   }
 })
 
@@ -33,11 +34,11 @@ router.post('/login', async (req, res, next) => {
         req.session.password = password
         res.send('we logged you in')
       } else {
-        res.send('ERROR: we could not log you in')
+        res.send('Error: we could not log you in')
       }
     })
   } catch (err) {
-    res.send(`ERROR: ${err}`)
+    res.send(`Error: ${err}`)
   }
 })
 

@@ -1,20 +1,14 @@
 const express = require('express')
+const client = require('twilio')(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN,
+)
+
 const Friends = require('../models/friends')
 const User = require('../models/user')
+
 const router = express.Router()
 const isAuthenticated = require('../middlewares/isAuthenticated')
-
-/**
- * every interaction with the database should have the following shape 
- * try: 
-    * make a call to DB to retrieve something: 
-    *  if it's there: 
-    *    do what you gotta do with it 
-    *  otherwise: 
-    *    res.send("ERROR: error message")
-* catch: 
-*   res.send('ERROR: error message')
-**/
 
 router.get('/', (req, res) => {
   res.send('On account API')
@@ -26,29 +20,79 @@ router.get('/users', async (req, res, next) => {
       if (questions) {
         res.send(questions)
       } else {
-        next('ERROR: there was a problem loading the questions')
+        next('Error: there was a problem loading the questions')
       }
     })
   } catch (err) {
-    res.send(`ERROR: ${err}`)
+    res.send(`Error: ${err}`)
+  }
+})
+
+router.get('/user/friends', async (req, res, next) => {
+  const currentUsername = req.session.username
+  console.log(`Session username is ${currentUsername}`)
+  try {
+    await User.find({ username: currentUsername }, 'friends', (err, value) => {
+      if (value) {
+        console.log(value)
+        const { friends } = value[0]
+        console.log(`got friends with length ${friends.length}`)
+        res.send(friends)
+      } else {
+        res.send(`Error: could not retrieve friends of ${currentUsername} because ${err}`)
+      }
+    })
+  } catch (err) {
+    res.send(`Error: ${err}`)
+  }
+})
+
+router.get('/user/number', async (req, res, next) => {
+  const currentUsername = req.session.username
+  console.log(`Session username is ${currentUsername}`)
+  try {
+    await User.find({ username: currentUsername }, 'phoneNumber', (err, value) => {
+      if (value) {
+        console.log(value)
+        const { phoneNumber } = value[0]
+        res.send(phoneNumber)
+      } else {
+        res.send(`Error: could not retrieve number of ${currentUsername} because ${err}`)
+      }
+    })
+  } catch (err) {
+    res.send(`Error: ${err}`)
   }
 })
 
 router.post('/friend', async (req, res) => {
   const { sender, getter } = req.body
   // if there already is a record for this sender and getter, want to update it to reflect that they are now friends. 
-  // if there isn't we want to create it. 
+  // if there isn't we want to create it.
   try {
-    const res = await Friends.updateOne( { sender: sender, getter: getter}, { status: 2 } )
-    if (res.n === 0) {
-      await Friends.create( { sender: sender, getter: getter, status: 2 }, (err, results) => {
+    const result = await Friends.updateOne({ sender, getter }, { status: 2 })
+    // are we updating an existing entry
+    if (result.n === 0) {
+      console.log('we are in the case where there is zero matching results')
+      await Friends.create({ sender, getter, status: 2 }, async (err, results) => {
         if (err) {
           res.send(`Error: could not befriend ${getter}.`)
         } else {
+          await User.updateOne({ username: sender }, { $addToSet: { friends: getter } })
+          await User.updateOne({ username: getter }, { $addToSet: { friends: sender } })
           res.send(`Success! You are now friends with ${getter}.`)
         }
       })
     } else {
+      console.log('we are in the case where there are some matching results')
+      await User.updateOne({ username: sender }, { $addToSet: { friends: getter } }, (err, success) => {
+        if (err) {
+          console.log('we were unable to add you to the friends list')
+        } else {
+          console.log('successs')
+        }
+      })
+      await User.updateOne({ username: getter }, { $addToSet: { friends: sender } })
       res.send(`Success! You are now friends with ${getter}.`)
     }
   } catch (err) {
@@ -59,17 +103,37 @@ router.post('/friend', async (req, res) => {
 router.post('/unfriend', async (req, res, next) => {
   const { sender, getter } = req.body
   // if there already is a record for this sender and getter, want to update it to reflect that they are no longer friends
-  // if there isn't then we remove it. 
+  // if there isn't then we remove it.
   try {
-    const res = await Friends.updateOne( { sender: sender, getter: getter}, { status: 1 } )
-    if (res.n === 0) {
+    const result = await Friends.updateOne({ sender, getter }, { status: 1 })
+    if (result.n === 0) {
       res.send(`Error: Cannot unfriend ${getter}. You must be friends to unfriend someone.`)
     } else {
+      await User.updateOne({ username: sender }, { $pop: { friends: getter } })
+      await User.updateOne({ username: getter }, { $pop: { friends: sender } })
       res.send(`You are no longer friends with ${getter}.`)
     }
   } catch (err) {
+    await User.updateOne({ username: sender }, { $pop: { friends: getter } })
+    await User.updateOne({ username: getter }, { $pop: { friends: sender } })
     res.send(`Error: there was a problem friending ${getter}.`)
   }
+})
+
+router.post('/messages', (req, res) => {
+  res.header('Content-Type', 'application/json')
+  client.messages.create({
+    from: process.env.TWILIO_PHONE_NUMBER,
+    to: req.body.to,
+    body: req.body.body,
+  })
+    .then(() => {
+      res.send(JSON.stringify({ sucess: true }))
+    })
+    .catch(err => {
+      console.log(err)
+      res.send(JSON.stringify({ success: false }))
+    })
 })
 
 module.exports = router
