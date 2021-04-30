@@ -7,7 +7,7 @@ import { Image, Card, Button } from 'react-bootstrap'
 import TinderCard from 'react-tinder-card'
 
 // Card component with destructured props
-const TinderCards = ({ isLoggedIn, currentUsername }) => {
+const TinderCards = ({ isLoggedIn, currentUsername, myPhoneNumber }) => {
   const [users, setUsers] = useState([])
 
   useEffect(async () => {
@@ -24,10 +24,13 @@ const TinderCards = ({ isLoggedIn, currentUsername }) => {
     borderRadius: 20,
   }
 
-  const swiped = async (dir, username) => {
+  // senderNumber -> number of person who is sending friend request
+  // getterNumber -> number of person who is getting friend request
+  const swiped = async (dir, username, senderNumber, getterNumber) => {
+    console.log(`Sender is ${currentUsername}. Getter is ${username}`)
+    console.log(`sender number is ${senderNumber}. Getter number is ${getterNumber}.`)
     if (dir === 'right' && isLoggedIn) {
-      console.log('also')
-      const { data, status } = await axios.post('api/friend', { sender: currentUsername, getter: username })
+      const { data, status } = await axios.post('api/friend', { sender: currentUsername, getter: username, senderNumber, getterNumber })
       if (status !== 200 || data.includes('Error')) {
         window.alert(data)
       }
@@ -43,10 +46,10 @@ const TinderCards = ({ isLoggedIn, currentUsername }) => {
   return (
     <div>
       <div className="tinderCards__cardContainer">
-        {users.filter(user => user.username !== currentUsername).map(({ username, hometown, major, school, image }, index) => (
+        {users.filter(user => user.username !== currentUsername).map(({ username, hometown, major, school, phoneNumber, image }, index) => (
           <TinderCard
             className="swipe"
-            onSwipe={dir => swiped(dir, username)}
+            onSwipe={dir => swiped(dir, username, myPhoneNumber, phoneNumber)}
             onCardLeftScreen={() => onCardLeftScreen(username)}
             key={username}
             preventSwipe={['up', 'down']}

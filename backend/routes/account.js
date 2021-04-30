@@ -15,6 +15,7 @@ router.post('/signup', async (req, res) => {
       if (user) {
         req.session.username = username
         req.session.password = password
+        req.session.number = phoneNumber
         res.send('we logged you in')
       } else {
         res.send(`Error: we could not log you in due to ${err}`)
@@ -26,12 +27,14 @@ router.post('/signup', async (req, res) => {
 })
 
 router.post('/login', async (req, res, next) => {
-  const { username, password } = req.body
+  const { username, password, number } = req.body
+  console.log(number)
   try {
     await User.findOne({ username, password }, (err, user) => {
       if (user) {
         req.session.username = username
         req.session.password = password
+        req.session.number = number
         res.send('we logged you in')
       } else {
         res.send('Error: we could not log you in')

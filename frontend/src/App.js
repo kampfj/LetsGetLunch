@@ -7,21 +7,33 @@ import Signup from './Signup'
 import Login from './Login'
 import Friends from './Friends'
 
-// there's nothing rendering on this page. We're just setting up the frontend routes and delegating rendering to the individual components.
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [username, setUsername] = useState('')
+  const [myPhoneNumber, setMyPhoneNumber] = useState('')
 
   const fetchLoggedIn = async () => {
     const { data } = await axios.get('/logged_in')
-    console.log(data)
     setIsLoggedIn(data.isLoggedIn)
     setUsername(data.username)
   }
 
+  const fetchNumber = async () => {
+    const { data, status } = await axios.get('api/user/number')
+    if (status !== 200 || data.includes('Error')) {
+      window.alert(data)
+    } else {
+      console.log(`We got back ${data}`)
+      setMyPhoneNumber(data)
+    }
+  }
+
   useEffect(async () => {
-    console.log(isLoggedIn)
-    fetchLoggedIn()
+    const result = await axios.get('/logged_in')
+    console.log(result.data.isLoggedIn)
+    setIsLoggedIn(result.data.isLoggedIn)
+    setUsername(result.data.username)
+    setMyPhoneNumber(result.data.number)
   }, [])
 
   return (
@@ -36,16 +48,16 @@ const App = () => {
         <br />
         <Switch>
           <Route path="/" exact>
-            <Homepage isLoggedIn={isLoggedIn} currentUsername={username} />
+            <Homepage isLoggedIn={isLoggedIn} currentUsername={username} myPhoneNumber={myPhoneNumber} />
           </Route>
           <Route path="/signup" exact>
-            <Signup isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} setCurrentUsername={setUsername} />
+            <Signup isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} setCurrentUsername={setUsername} setCurrentPhoneNumber={setMyPhoneNumber} />
           </Route>
           <Route path="/login" exact>
-            <Login isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} setUsername={setUsername} />
+            <Login isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} setUsername={setUsername} setCurrentPhoneNumber={setMyPhoneNumber} />
           </Route>
           <Route path="/friends" exact>
-            <Friends currentUsername={username} />
+            <Friends currentUsername={username} myPhoneNumber={myPhoneNumber} />
           </Route>
         </Switch>
       </Router>

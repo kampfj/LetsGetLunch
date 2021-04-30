@@ -41,6 +41,7 @@ app.get('/logged_in', (req, res) => {
     res.send({
       isLoggedIn: true,
       username: req.session.username,
+      number: req.session.number,
     })
   }
 })

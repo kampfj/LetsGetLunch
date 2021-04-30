@@ -49,12 +49,12 @@ router.get('/user/friends', async (req, res, next) => {
 
 router.get('/user/number', async (req, res, next) => {
   const currentUsername = req.session.username
-  console.log(`Session username is ${currentUsername}`)
   try {
     await User.find({ username: currentUsername }, 'phoneNumber', (err, value) => {
       if (value) {
         console.log(value)
         const { phoneNumber } = value[0]
+        console.log(`phone number is ${phoneNumber}`)
         res.send(phoneNumber)
       } else {
         res.send(`Error: could not retrieve number of ${currentUsername} because ${err}`)
@@ -66,9 +66,7 @@ router.get('/user/number', async (req, res, next) => {
 })
 
 router.post('/friend', async (req, res) => {
-  const { sender, getter } = req.body
-  // if there already is a record for this sender and getter, want to update it to reflect that they are now friends. 
-  // if there isn't we want to create it.
+  const { sender, getter, senderNumber, getterNumber } = req.body
   try {
     const result = await Friends.updateOne({ sender, getter }, { status: 2 })
     // are we updating an existing entry
@@ -78,22 +76,33 @@ router.post('/friend', async (req, res) => {
         if (err) {
           res.send(`Error: could not befriend ${getter}.`)
         } else {
-          await User.updateOne({ username: sender }, { $addToSet: { friends: getter } })
-          await User.updateOne({ username: getter }, { $addToSet: { friends: sender } })
+          await User.updateOne({ username: sender }, { $addToSet: { friends: { name: getter, number: getterNumber } } }, (error, success) => {
+            if (error) {
+              console.log(error)
+            }
+          })
+          await User.updateOne({ username: getter }, { $addToSet: { friends: { name: sender, number: senderNumber } } }, (error, success) => {
+            if (error) {
+              console.log(error)
+            }
+          })
           res.send(`Success! You are now friends with ${getter}.`)
         }
       })
     } else {
       console.log('we are in the case where there are some matching results')
-      await User.updateOne({ username: sender }, { $addToSet: { friends: getter } }, (err, success) => {
+      await User.updateOne({ username: sender }, { $addToSet: { friends: { name: getter, number: getterNumber } } }, (err, success) => {
         if (err) {
           console.log('we were unable to add you to the friends list')
         } else {
           console.log('successs')
         }
       })
-      await User.updateOne({ username: getter }, { $addToSet: { friends: sender } })
-      res.send(`Success! You are now friends with ${getter}.`)
+      await User.updateOne({ username: getter }, { $addToSet: { friends: { name: sender, number: senderNumber } } }, (err, success) => {
+        if (err) {
+          console.log(err)
+        }
+      })
     }
   } catch (err) {
     res.send(`Error: there was a problem friending ${getter}.`)
@@ -101,21 +110,19 @@ router.post('/friend', async (req, res) => {
 })
 
 router.post('/unfriend', async (req, res, next) => {
-  const { sender, getter } = req.body
-  // if there already is a record for this sender and getter, want to update it to reflect that they are no longer friends
-  // if there isn't then we remove it.
+  const { sender, getter, senderNumber, getterNumber } = req.body
   try {
     const result = await Friends.updateOne({ sender, getter }, { status: 1 })
     if (result.n === 0) {
       res.send(`Error: Cannot unfriend ${getter}. You must be friends to unfriend someone.`)
     } else {
-      await User.updateOne({ username: sender }, { $pop: { friends: getter } })
-      await User.updateOne({ username: getter }, { $pop: { friends: sender } })
+      await User.updateOne({ username: sender }, { $pop: { friends: { name: getter, nunber: getterNumber } } })
+      await User.updateOne({ username: getter }, { $pop: { friends: { name: sender, number: senderNumber } } })
       res.send(`You are no longer friends with ${getter}.`)
     }
   } catch (err) {
-    await User.updateOne({ username: sender }, { $pop: { friends: getter } })
-    await User.updateOne({ username: getter }, { $pop: { friends: sender } })
+    await User.updateOne({ username: sender }, { $pop: { friends: { name: getter, number: getterNumber } } })
+    await User.updateOne({ username: getter }, { $pop: { friends: { name: sender, number: senderNumber } } })
     res.send(`Error: there was a problem friending ${getter}.`)
   }
 })

@@ -8,7 +8,7 @@ const userSchema = new Schema({
   hometown: { type: String, required: true },
   major: { type: String },
   school: { type: String },
-  friends: [{ type: String }],
+  friends: [],
 })
 
 module.exports = model('User', userSchema)

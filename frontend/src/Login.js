@@ -3,18 +3,20 @@ import axios from 'axios'
 import { Link, Redirect } from 'react-router-dom'
 import { Container, Form, Button } from 'react-bootstrap'
 
-const Login = ({ isLoggedIn, setIsLoggedIn, setUsername }) => {
+const Login = ({ isLoggedIn, setIsLoggedIn, setUsername, setCurrentPhoneNumber }) => {
   const [currentUsername, setCurrentUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [myPhoneNumber, setMyPhoneNumber] = useState('')
 
   const submitHelper = async () => {
-    const { data, status } = await axios.post('account/login', { username: currentUsername, password })
+    const { data, status } = await axios.post('account/login', { username: currentUsername, password, number: myPhoneNumber })
     console.log(data)
     if (status !== 200 || data.includes('Error')) {
       window.alert(data)
     } else {
       setUsername(currentUsername)
       setIsLoggedIn(true)
+      setCurrentPhoneNumber(myPhoneNumber)
     }
   }
 
@@ -35,6 +37,10 @@ const Login = ({ isLoggedIn, setIsLoggedIn, setUsername }) => {
           <Form.Group controlId="formBasicPassword">
             <Form.Label> Password </Form.Label>
             <Form.Control type="password" value={password} placeholder="Enter password" onChange={e => setPassword(e.target.value)} />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label> Phone Number </Form.Label>
+            <Form.Control value={myPhoneNumber} placeholder="Enter number" onChange={e => setMyPhoneNumber(e.target.value)} />
           </Form.Group>
           <Button size="sm" variant="outline-primary" onClick={submitHelper}>
             Login

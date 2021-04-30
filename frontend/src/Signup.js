@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { Container, Button, Form } from 'react-bootstrap'
 
-const Signup = ({ isLoggedIn, setIsLoggedIn, setCurrentUsername }) => {
+const Signup = ({ isLoggedIn, setIsLoggedIn, setCurrentUsername, setCurrentPhoneNumber }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [image, setImage] = useState('')
@@ -19,6 +19,7 @@ const Signup = ({ isLoggedIn, setIsLoggedIn, setCurrentUsername }) => {
     }
     setIsLoggedIn(true)
     setCurrentUsername(username)
+    setCurrentPhoneNumber(phoneNumber)
     console.log(data)
     console.log('posted to the db')
   }

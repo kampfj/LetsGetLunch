@@ -3,10 +3,10 @@ import axios from 'axios'
 import '../styles/index.css'
 import TinderCards from './TinderCards'
 
-const Homepage = ({ isLoggedIn, currentUsername }) => {
+const Homepage = ({ isLoggedIn, currentUsername, myPhoneNumber }) => {
 
   return (
-    <TinderCards isLoggedIn={isLoggedIn} currentUsername={currentUsername} />
+    <TinderCards isLoggedIn={isLoggedIn} currentUsername={currentUsername} myPhoneNumber={myPhoneNumber} />
   )
 }
 
