@@ -3,7 +3,7 @@ import axios from 'axios'
 import { BrowserRouter as Router, Switch, Route, Redirect, Link } from 'react-router-dom'
 import { Modal, Container, Form, Button } from 'react-bootstrap'
 
-const SMSForm = ({ phoneNumber, usename, recipient, messageMode, setMessageMode }) => {
+const SMSForm = ({ phoneNumber, username, recipient, messageMode, setMessageMode }) => {
   // if you're friends you get to see their number
   const [myNumber, setMyNumber] = useState('')
   const [message, setMessage] = useState('')
