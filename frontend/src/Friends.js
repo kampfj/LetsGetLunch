@@ -24,7 +24,7 @@ const Friends = ({ currentUsername }) => {
     }
   }, [])
 
-  useEffect(async() => {
+  useEffect(async () => {
     const { data, status } = await axios.get('api/user/number')
     if (status !== 200 || data.includes('Error')) {
       window.alert(data)
